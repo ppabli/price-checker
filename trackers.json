@@ -1,0 +1,22 @@
+{
+	"name": "Trackers",
+	"lastUpdateTimestamp": "",
+	"trackers": {
+		"e0986293812cc806336840a6d4dd2d0e": {
+			"code": "e0986293812cc806336840a6d4dd2d0e",
+			"name": "Prueba 1",
+			"URL": "google.es",
+			"price": 50,
+			"createdTimestamp": 1592733178.14084,
+			"lastUpdateTimestamp": 1592733178.14084
+		},
+		"07306c3ba8ea8cd16828200fb72f5082": {
+			"code": "07306c3ba8ea8cd16828200fb72f5082",
+			"name": "new name",
+			"URL": "amazon.es",
+			"price": 50,
+			"createdTimestamp": 1592733178.141448,
+			"lastUpdateTimestamp": 1592733178.1419818
+		}
+	}
+}

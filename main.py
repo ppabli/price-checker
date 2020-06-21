@@ -5,8 +5,6 @@ from bs4 import BeautifulSoup
 import mysql.connector
 import sys
 
-sys.path.append("..")
-import config
 import smtplib
 
 headers = {
@@ -33,7 +31,6 @@ estados = {
     3: "terminado",
     4: "notificado"
 }
-
 
 def mostrarOpciones():
     print("Tenemos estas opciones: ")
