@@ -2,6 +2,7 @@ import json
 from Tracker import Tracker
 from Thread import Thread
 
+
 class App:
 
 	def __init__(self):

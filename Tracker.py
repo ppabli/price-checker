@@ -8,6 +8,7 @@ import smtplib
 from bs4 import BeautifulSoup as beautifulSoup
 import ssl
 
+
 class Tracker:
 
 	"""Tracker class
