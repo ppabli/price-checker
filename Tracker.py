@@ -108,11 +108,19 @@ class Tracker:
 					page = requests.get(self.__URL, headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'})
 					soup1 = beautifulSoup(page.content, 'html.parser')
 					soup2 = beautifulSoup(soup1.prettify(), "html.parser")
-					element = soup2.find(id = obj[web]['element'])
+
+					element = soup2.find(obj[web]["tag"], attrs = obj[web]["attributes"])
 
 					if (element):
 
-						text = element.getText()
+						if obj[web]["inside"] == False:
+
+							text = element.getText()
+
+						else:
+
+							text = element[obj[web]["inside"]]
+
 						text2 = text.strip().replace(",", ".")
 						price = float(re.sub('$|€', '', text2))
 

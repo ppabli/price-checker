@@ -2,32 +2,26 @@
 
 	"amazon": {
 
-		"element": "price_inside_buybox",
-		"attribute": "",
-		"createdTimestamp": 1592824986,
-		"lastUpdateTimestamp": 1592824986
+		"tag": "span",
+		"attributes": {
 
-	},
-	"aliexpress": {
+			"id": "priceblock_ourprice"
 
-		"element": "product-price-value",
-		"attribute": "",
-		"createdTimestamp": 1592824986,
-		"lastUpdateTimestamp": 1592824986
-
-	},
-	"pccomponentes": {
-
-		"element": "precio-main",
-		"attribute": "",
+		},
+		"inside": false,
 		"createdTimestamp": 1592824986,
 		"lastUpdateTimestamp": 1592824986
 
 	},
 	"mediamarkt": {
 
-		"element": "price",
-		"attribute": "",
+		"tag": "meta",
+		"attributes": {
+
+			"itemprop": "price"
+
+		},
+		"inside": "content",
 		"createdTimestamp": 1592824986,
 		"lastUpdateTimestamp": 1592824986
 
