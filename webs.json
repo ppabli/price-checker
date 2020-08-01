@@ -25,6 +25,59 @@
 		"createdTimestamp": 1592824986,
 		"lastUpdateTimestamp": 1592824986
 
+	},
+	"eglobalcentral": {
+
+		"tag": "tag",
+		"attributes": {
+
+			"id": "product-price-38209"
+
+		},
+		"inside": false,
+		"createdTimestamp": 1596306664,
+		"lastUpdateTimestamp": 1596306664
+
+	},
+	"pccomponentes": {
+
+		"tag": "div",
+		"attributes": {
+
+			"id": "precio-main"
+
+		},
+		"inside": "data-price",
+		"createdTimestamp": 1596306664,
+		"lastUpdateTimestamp": 1596306664
+
+	},
+	"aliexpress": {
+
+		"tag": "span",
+		"attributes": {
+
+			"class": "product-price-value",
+			"itemprop": "price"
+
+		},
+		"inside": false,
+		"createdTimestamp": 1596306664,
+		"lastUpdateTimestamp": 1596306664
+
+	},
+	"ebay": {
+
+		"tag": "span",
+		"attributes": {
+
+			"id": "prcIsum"
+
+		},
+		"inside": false,
+		"createdTimestamp": 1596306664,
+		"lastUpdateTimestamp": 1596306664
+
 	}
 
 }
