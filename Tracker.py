@@ -1,177 +1,101 @@
-import json
 import hashlib
 import time
 import re
 import requests
-from config import config
 import smtplib
 from bs4 import BeautifulSoup as beautifulSoup
 import ssl
+
+import config
 
 
 class Tracker:
 
 	"""Tracker class
-	Version: 0.1
+	Version: 0.2
 	Author: Pablo Liste Cancela
 	Last update: 22/06/2020
 	"""
 
-	def __init__ (self, name, URL, email, desirePrice, price = -1):
+	def __init__ (self, name, url, webData, email, desirePrice, price = -1):
 
-		self.__code = hashlib.md5(URL.encode()).hexdigest()
+		self.__code = hashlib.md5(url.encode()).hexdigest()
 		self.__createdTimestamp = time.time()
 		self.__lastUpdateTimestamp = time.time()
 
 		self.__name = name
-		self.__URL = URL
+		self.__url = url
+		self.__webData = webData
 		self.__email = email
 		self.__desirePrice = desirePrice
 
 		self.__price = price
 
-	def addTracker(self):
-
-		with open('trackers.json') as file:
-
-			obj = json.load(file)
-
-			if (not self.__code in obj['trackers']):
-
-				obj['lastUpdateTimestamp'] = time.time()
-				obj['trackers'][self.__code] = self.__dict__
-
-				with open('trackers.json', 'w', encoding = 'utf8') as file:
-
-					json.dump(obj, file, indent = '\t')
-
-					print('Tracker added correctly')
-
-			else:
-
-				print('Tracker already exists')
-
-	def updateTracker(self):
-
-		with open('trackers.json') as file:
-
-			obj = json.load(file)
-
-			if (self.__code in obj['trackers']):
-
-				self.__lastUpdateTimestamp = time.time()
-
-				obj['lastUpdateTimestamp'] = time.time()
-				obj['trackers'][self.__code] = (self.__dict__)
-
-				with open('trackers.json', 'w', encoding = 'utf8') as file:
-
-					json.dump(obj, file, indent = '\t')
-
-					print('Tracker updated correctly')
-
-			else:
-
-				print('Tracker do not exists')
-
-	def removeTracker(self):
-
-		with open('trackers.json') as file:
-
-			obj = json.load(file)
-
-			if self.__code in obj['trackers']:
-
-				del obj['trackers'][self.__code]
-				obj['lastUpdateTimestamp'] = time.time()
-
-				with open('trackers.json', 'w', encoding = 'utf8') as file:
-
-					json.dump(obj, file, indent = '\t')
-
-					print('Tracker removed correctly')
-
-			else:
-
-				print('Tracker do not exists')
-
 	def trackPrice(self):
 
-		with open('webs.json') as file:
+		page = requests.get(self.__url, headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"})
+		soup1 = beautifulSoup(page.content, "html.parser")
+		soup2 = beautifulSoup(soup1.prettify(), "html.parser")
 
-			obj = json.load(file)
+		element = soup2.find(self.__webData["tag"], attrs = self.__webData["attributes"])
 
-			for web in obj.keys():
+		if (element):
 
-				if (re.search(web, self.__URL)):
+			if self.__webData["inside"] == False:
 
-					page = requests.get(self.__URL, headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'})
-					soup1 = beautifulSoup(page.content, 'html.parser')
-					soup2 = beautifulSoup(soup1.prettify(), "html.parser")
-
-					element = soup2.find(obj[web]["tag"], attrs = obj[web]["attributes"])
-
-					if (element):
-
-						if obj[web]["inside"] == False:
-
-							text = element.getText()
-
-						else:
-
-							text = element[obj[web]["inside"]]
-
-						text2 = text.strip().replace(",", ".")
-						price = float(re.sub('$|€', '', text2))
-
-						self.__price = price
-
-						if (self.__price <= self.__desirePrice):
-
-							self.sendEmail();
-
-						self.updateTracker()
-
-					else:
-
-						print('No element detected')
-
-					break
+				text = element.getText()
 
 			else:
 
-				print('No web detetected')
+				text = element[self.__webData["inside"]]
 
-		print('Track done')
+			text2 = text.strip().replace(",", ".")
+			price = float(re.sub("$|€", '', text2))
+
+			self.__price = price
+
+			if (self.__price <= self.__desirePrice):
+
+				self.sendEmail();
+
+			else:
+
+				print("No element detected")
+
+		else:
+
+			print("No web detetected")
+
+		print("Track done")
 
 	def sendEmail(self):
 
 		try:
 
-			server = smtplib.SMTP('smtp.gmail.com', 587)
+			server = smtplib.SMTP("smtp.gmail.com", 587)
 			server.ehlo()
 			server.starttls()
 			server.ehlo()
 
-			server.login(config['email'], config['emailPassword'])
+			server.login(config.EMAILADDRESS, config.EMAILPASSWORD)
 
-			subject = f'The product {self.__name} has dropped in price.'
-			body = f'This is an automated message from price tracker.\nThe product{self.__name} with code: {self.__code} it has dropped in price and now it costs {self.__price} euros.\nCheck the product in this link {self.__URL}'
+			subject = f"The product {self.__name} has dropped in price."
+			body = f"This is an automated message from price tracker.\nThe product{self.__name} with code: {self.__code} it has dropped in price and now it costs {self.__price} euros.\nCheck the product in this link {self.__url}"
 
-			message = f"Subject: {subject}\n\n{body}".encode('utf-8')
+			message = f"Subject: {subject}\n\n{body}".encode("utf-8")
 			server.sendmail(
 
-				config['email'],
+				config.EMAILADDRESS,
 				self.__email,
 				message
 
 			)
 
-			print('Email sended')
+			print("Email sended")
 
 		except:
 
-			print('Error on email')
+			print("Error on email")
 
 		finally:
 
@@ -187,7 +111,7 @@ class Tracker:
 
 	def getURL(self):
 
-		return self.__URL
+		return self.__url
 
 	def getEmail(self):
 
@@ -204,14 +128,11 @@ class Tracker:
 	def setName(self, name):
 
 		self.__name = name
-		self.updateTracker()
 
 	def setEmail(self, email):
 
 		self.__email = email
-		self.updateTracker()
 
 	def setDesirePrice(self, desirePrice):
 
 		self.__desirePrice = desirePrice
-		self.updateTracker()

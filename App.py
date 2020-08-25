@@ -1,4 +1,8 @@
 import json
+import os
+import time
+import re
+
 from Tracker import Tracker
 from Thread import Thread
 
@@ -7,15 +11,38 @@ class App:
 
 	def __init__(self):
 
+		self.__webs = {}
+
+		with open("webs.json") as file:
+
+			self.__webs = json.load(file)
+
 		self.__trackers = []
 
-		with open('trackers.json') as file:
+		if not os.path.exists("trackers.json"):
 
-			obj = json.load(file)
+			with open("trackers.json") as file:
 
-			for tracker in obj['trackers'].values():
+				data = {}
+				data["lastUpdateTimestamp"] = ""
+				data["trackers"] = {}
 
-				self.__trackers.append(Tracker(tracker['_Tracker__name'], tracker['_Tracker__URL'], tracker['_Tracker__email'], tracker['_Tracker__desirePrice'], tracker['_Tracker__price']))
+				json.dump(data, file, indet = "\t")
+
+		else:
+
+			with open("trackers.json") as file:
+
+				obj = json.load(file)
+
+				for tracker in obj["trackers"].values():
+
+					for web in self.__webs.keys():
+
+						if re.search(web, tracker["_Tracker__url"]):
+
+							t = Tracker(tracker["_Tracker__name"], tracker["_Tracker__url"], self.__webs[web], tracker["_Tracker__email"], tracker["_Tracker__desirePrice"], tracker["_Tracker__price"])
+							self.__trackers.append(t)
 
 		self.__options = {
 
@@ -64,7 +91,7 @@ class App:
 		while True:
 
 			self.displayOptions()
-			option = int(input('Enter option number: '))
+			option = int(input("Enter option number: "))
 
 			if option == -1:
 
@@ -75,59 +102,61 @@ class App:
 
 					self.__thread = None
 
-				print('Bye')
+				self.updateFile()
+
+				print("Bye")
 				break
 
 			else:
 
 				if option in self.__options.keys():
 
-					self.__options[option]['method']()
+					self.__options[option]["method"]()
 
 				else:
 
-					print('Invalid option')
+					print("Invalid option")
 
 	def displayOptions(self):
 
 		for option in self.__options:
 
-			print(f'{option} - {self.__options[option]["description"]}')
+			print(f"{option} - {self.__options[option]['description']}")
 
 	def displayTrackers(self):
 
-		print('index - code - name - desirePrice - price - URL')
+		print("index - code - name - desirePrice - price - url")
 
 		for index, tracker in enumerate(self.__trackers):
 
-			print(f'{index} - {tracker.getCode()} - {tracker.getName()} - {tracker.getDesirePrice()} - {tracker.getPrice()} - {tracker.getURL()}')
+			print(f"{index} - {tracker.getCode()} - {tracker.getName()} - {tracker.getDesirePrice()} - {tracker.getPrice()} - {tracker.getURL()}")
 
 	def addTracker(self):
 
 		name = input('Enter tracker name: ')
-		URL = input('Enter tracker URL: ')
+		url = input('Enter tracker url: ')
 		email = input('Enter email to notify: ')
 		desirePrice = float(input('Enter desire price: '))
 
-		newTracker = Tracker(name, URL, email, desirePrice)
+		for web in self.__webs.keys():
 
-		newTracker.addTracker()
-		self.__trackers.append(newTracker)
+			if re.search(web, url):
 
-		if self.__thread:
+				newTracker = Tracker(name, url, self.__webs[web], email, desirePrice)
 
-			self.__thread.updateTrackers(self.__trackers)
+				self.__trackers.append(newTracker)
+
+				if self.__thread:
+
+					self.__thread.updateTrackers(self.__trackers)
 
 	def removeTracker(self):
 
 		self.displayTrackers()
-		trackerIndex = int(input('Enter tracker index to remove: '))
+		trackerIndex = int(input("Enter tracker index to remove: "))
 
 		if trackerIndex > -1 and trackerIndex < len(self.__trackers):
 
-			removeTracker = self.__trackers[trackerIndex]
-
-			removeTracker.removeTracker()
 			del self.__trackers[trackerIndex]
 
 			if self.__thread:
@@ -136,7 +165,35 @@ class App:
 
 		else:
 
-			print('Invalid index')
+			print("Invalid index")
+
+	def updateFile(self):
+
+		with open("trackers.json") as file:
+
+			obj = json.load(file)
+
+			codeList = []
+
+			for tracker in self.__trackers:
+
+				codeList.append(tracker.getCode())
+
+				obj["trackers"][tracker.getCode()] = tracker.__dict__
+
+			if len(self.__trackers) != len(obj["trackers"]):
+
+				removeID = list(set(obj["trackers"].keys()) - set(codeList))
+
+				for id in removeID:
+
+					del obj["trackers"][id]
+
+			obj["lastUpdateTimestamp"] = time.time()
+
+			with open("trackers.json", "w", encoding = "utf8") as file:
+
+				json.dump(obj, file, indent = "\t")
 
 	def startThread(self):
 
@@ -147,11 +204,11 @@ class App:
 
 			self.__thread.start()
 
-			print('Thread enabled')
+			print("Thread enabled")
 
 		else:
 
-			print('Thread already enabled')
+			print("Thread already enabled")
 
 	def stopThread(self):
 
@@ -162,8 +219,8 @@ class App:
 
 			self.__thread = None
 
-			print('Thread stopped')
+			print("Thread stopped")
 
 		else:
 
-			print('No thread')
+			print("No thread")
