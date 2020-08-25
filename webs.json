@@ -78,6 +78,45 @@
 		"createdTimestamp": 1596306664,
 		"lastUpdateTimestamp": 1596306664
 
+	},
+	"carrefour": {
+
+		"tag": "span",
+		"attributes": {
+
+			"class": "buybox__price--current"
+
+		},
+		"inside": false,
+		"createdTimestamp": 1596308731,
+		"lastUpdateTimestamp": 1596308731
+
+	},
+	"zara": {
+
+		"tag": "span",
+		"attributes": {
+
+			"class": "main-price"
+
+		},
+		"inside": false,
+		"createdTimestamp": 1596308731,
+		"lastUpdateTimestamp": 1596308731
+
+	},
+	"pullandbear": {
+
+		"tag": "span",
+		"attributes": {
+
+			"class": "number"
+
+		},
+		"inside": false,
+		"createdTimestamp": 1596308731,
+		"lastUpdateTimestamp": 1596308731
+
 	}
 
 }
